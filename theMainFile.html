@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Sorting Visualizer</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      background: #9a60c3;
+    }
+
+    h1 {
+      margin-top: 20px;
+    }
+
+    .controls {
+      margin: 15px 0;
+    }
+
+    button {
+      margin: 5px;
+      padding: 10px 20px;
+      border: 3px;
+      border-radius: 10px;
+      background: rgb(215, 69, 244);
+      color: rgb(57, 9, 116);
+      font-weight: bold;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+
+    button:hover {
+      background: rgb(88, 61, 179);
+    }
+
+    #container {
+      display: flex;
+      align-items: flex-end;
+      justify-content: center;
+      height: 400px;
+      background: rgb(219, 90, 111);   /* gap color */
+      gap: 2px;
+      margin: 20px auto;
+      width: 90%;
+      border: 2px solid black;
+      border-radius: 8px;
+    }
+
+    .bar {
+      width: 20px;
+      border: 5px;
+      background-color: rgb(129, 5, 133);
+      border-bottom:2px solid rgb(0, 0, 0);
+      border-top: 2px solid rgb(0, 0, 0);
+      border-right:2px solid rgb(0, 0, 0) ;
+      border-left:2px solid rgb(0, 0, 0) ;
+    }
+
+    #description {
+      font-size: 16px;
+      margin: 20px auto;
+      width: 80%;
+      max-width: 600px;
+      padding: 10px;
+      border: 1px solid rgb(0, 0, 0);
+      border-radius: 6px;
+      background: rgba(215, 69, 244, 0.601);
+    }
+  </style>
+</head>
+<body>
+  <h1>Sorting Visualizer</h1>
+  <p> Tired of learning codes from the books?</p>
+   <P>watch the Visualizer to learn on your own and code it up yourself!</p>
+  <div class="controls">
+    <label for="speedRange">Speed:</label>
+   <input id="speedRange" type="range" min="1" max="200" value="30">
+   <span id="speedValue">30ms</span>
+
+    <button onclick="setDescription('bubble'); bubbleSort()">Bubble Sort</button>
+    <button onclick="setDescription('selection'); selectionSort()">Selection Sort</button>
+    <button onclick="setDescription('insertion'); insertionSort()">Insertion Sort</button>
+    <button onclick="setDescription('merge'); mergeSort()">Merge Sort</button>
+    <button onclick="setDescription('quick'); quickSort()">Quick Sort</button>
+    <button onclick="generateBars()">Generate New Array</button>
+  </div>
+
+  <p id="description">Click an algorithm button to see how it works!</p>
+
+  <div id="container"></div>
+
+  <script>
+    const container = document.getElementById("container");
+
+    // Utility: sleep
+    function sleep(ms) {
+      return new Promise(resolve => setTimeout(resolve, ms));
+    }
+    let isRunning = false;                  // global flag
+const speedRange = document.getElementById("speedRange");
+const speedValue = document.getElementById("speedValue");
+
+function getDelay() {
+  // Convert slider to delay in ms (you can tweak mapping)
+  return parseInt(speedRange.value);
+}
+
+speedRange.addEventListener('input', () => {
+  speedValue.innerText = `${speedRange.value}ms`;
+});
+
+function setControlsDisabled(disabled) {
+  document.querySelectorAll('.controls button').forEach(b => b.disabled = disabled);
+  speedRange.disabled = disabled;
+  isRunning = disabled; // true when disabled (algorithm running)
+}
+
+
+    // Generate random bars
+    function generateBars(num = 50) {
+      container.innerHTML = "";
+      for (let i = 0; i < num; i++) {
+        const value = Math.floor(Math.random() * 300) + 20;
+        const bar = document.createElement("div");
+        bar.classList.add("bar");
+        bar.style.height = value + "px";
+        container.appendChild(bar);
+      }
+    }
+
+    generateBars(); // initial bars
+
+    // Set description
+    function setDescription(algorithm) {
+      const desc = document.getElementById("description");
+      if (algorithm === "bubble") {
+        desc.innerText = "Bubble Sort: repeatedly compares adjacent elements and swaps them if out of order. Largest elements bubble to the top each pass.";
+      } else if (algorithm === "selection") {
+        desc.innerText = "Selection Sort: finds the smallest element and places it at the beginning, repeating for each position.";
+      } else if (algorithm === "insertion") {
+        desc.innerText = "Insertion Sort: builds the sorted array one item at a time by inserting elements into their correct position.";
+      } else if (algorithm === "merge") {
+        desc.innerText = "Merge Sort: divides the array into halves, sorts them recursively, and merges the sorted halves.";
+      } else if (algorithm === "quick") {
+        desc.innerText = "Quick Sort: picks a pivot element, partitions the array around it, and recursively sorts the partitions.";
+      }
+    }
+
+    // Sorting algorithms
+
+    // Bubble Sort
+    async function bubbleSort() {
+      let bars = document.getElementsByClassName("bar");
+      for (let i = 0; i < bars.length; i++) {
+        for (let j = 0; j < bars.length - i - 1; j++) {
+          bars[j].style.background = "rgb(34,23,22)";
+          bars[j + 1].style.background = "rgb(34,23,22)";
+          await sleep(30);
+
+          if (parseInt(bars[j].style.height) > parseInt(bars[j + 1].style.height)) {
+            let temp = bars[j].style.height;
+            bars[j].style.height = bars[j + 1].style.height;
+            bars[j + 1].style.height = temp;
+          }
+
+          bars[j].style.background = "rgb(74, 11, 32)";
+          bars[j + 1].style.background = "rgb(74, 11, 32)";
+        }
+        bars[bars.length - i - 1].style.background = "rgb(168, 35, 75)";
+      }
+    }
+
+    // Selection Sort
+    async function selectionSort() {
+      let bars = document.getElementsByClassName("bar");
+      for (let i = 0; i < bars.length; i++) {
+        let minIndex = i;
+        bars[i].style.background = "#380334";
+        for (let j = i + 1; j < bars.length; j++) {
+          bars[j].style.background = "#a60899";
+          await sleep(30);
+
+          if (parseInt(bars[j].style.height) < parseInt(bars[minIndex].style.height)) {
+            minIndex = j;
+          }
+          bars[j].style.background = "#63042f";
+        }
+        let temp = bars[i].style.height;
+        bars[i].style.height = bars[minIndex].style.height;
+        bars[minIndex].style.height = temp;
+        bars[i].style.background = "#610e22";
+      }
+    }
+
+    // Insertion Sort
+    async function insertionSort() {
+      let bars = document.getElementsByClassName("bar");
+      for (let i = 1; i < bars.length; i++) {
+        let key = bars[i].style.height;
+        let j = i - 1;
+        bars[i].style.background = "#380934";
+        await sleep(30);
+
+        while (j >= 0 && parseInt(bars[j].style.height) > parseInt(key)) {
+          bars[j + 1].style.height = bars[j].style.height;
+          bars[j].style.background = "#a60899";
+          await sleep(30);
+          j--;
+        }
+        bars[j + 1].style.height = key;
+        bars[i].style.background = "#610e22";
+      }
+    }
+
+    // Merge Sort
+    async function mergeSort(l = 0, r = document.getElementsByClassName("bar").length - 1) {
+      if (l >= r) return;
+      let m = Math.floor((l + r) / 2);
+      await mergeSort(l, m);
+      await mergeSort(m + 1, r);
+      await merge(l, m, r);
+    }
+
+    async function merge(l, m, r) {
+      let bars = document.getElementsByClassName("bar");
+      let left = [], right = [];
+
+      for (let i = l; i <= m; i++) left.push(bars[i].style.height);
+      for (let i = m + 1; i <= r; i++) right.push(bars[i].style.height);
+
+      let i = 0, j = 0, k = l;
+      while (i < left.length && j < right.length) {
+        bars[k].style.background = "#610e22";
+        await sleep(30);
+
+        if (parseInt(left[i]) <= parseInt(right[j])) {
+          bars[k].style.height = left[i++];
+        } else {
+          bars[k].style.height = right[j++];
+        }
+        bars[k].style.background = "#a60899";
+        k++;
+      }
+      while (i < left.length) {
+        bars[k++].style.height = left[i++];
+      }
+      while (j < right.length) {
+        bars[k++].style.height = right[j++];
+      }
+    }
+
+    // Quick Sort
+    async function quickSort(low = 0, high = document.getElementsByClassName("bar").length - 1) {
+      if (low < high) {
+        let pi = await partition(low, high);
+        await quickSort(low, pi - 1);
+        await quickSort(pi + 1, high);
+      }
+    }
+
+    async function partition(low, high) {
+      let bars = document.getElementsByClassName("bar");
+      bars[high].style.background = "";
+      let pivot = parseInt(bars[high].style.height);
+      
+      let i = low - 1;
+
+      for (let j = low; j < high; j++) {
+        bars[j].style.background = "#a60899";
+        await sleep(30);
+        if (parseInt(bars[j].style.height) < pivot) {
+          i++;
+          let temp = bars[i].style.height;
+          bars[i].style.height = bars[j].style.height;
+          bars[j].style.height = temp;
+        }
+        bars[j].style.background = "#610e22";
+      }
+      let temp = bars[i + 1].style.height;
+      bars[i + 1].style.height = bars[high].style.height;
+      bars[high].style.height = temp;
+      return i + 1;
+    }
+
+  </script>
+</body>
+</html>
